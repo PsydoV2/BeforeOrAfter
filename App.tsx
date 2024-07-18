@@ -1,20 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import StartPage from "./components/StartPage";
+import { useState } from "react";
 
 export default function App() {
+  const [showStartPage, toggleStartPage] = useState(true);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={styles.main}>
+      {showStartPage && <StartPage></StartPage>}
+      <StatusBar style="light" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  main: {
+    position: "relative",
+    backgroundColor: "black",
+    height: "100%",
+    width: "100%",
   },
 });
