@@ -15,11 +15,12 @@ export default function StartPage(props: StartPageProps) {
       <Text style={styles.highScore}>Highscore: 234</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+        onPress={() => {
+          props.handelToggle;
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }}
       >
-        <Text style={styles.buttonText} onPress={props.handelToggle}>
-          Start Game
-        </Text>
+        <Text style={styles.buttonText}>Start Game</Text>
       </TouchableOpacity>
     </View>
   );
@@ -39,6 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 20,
+    zIndex: 20,
   },
   title: {
     fontSize: 50,
