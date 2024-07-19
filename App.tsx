@@ -10,6 +10,7 @@ import StartPage from "./components/StartPage";
 import { useEffect, useState } from "react";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_TOKEN } from "@env";
 
 interface MovieProps {
   Poster: string;
@@ -21,10 +22,10 @@ interface MovieProps {
 
 export default function App() {
   const [showStartPage, toggleStartPage] = useState(true);
-  const key = "ba5bd1b3";
   const [currentMovie, setCurrentMovie] = useState<MovieProps>();
   const [nextMovie, setNextMovie] = useState<MovieProps>();
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
 
   function randomIntFromInterval(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -32,10 +33,11 @@ export default function App() {
 
   function getCurrentMovie() {
     const randomYear = randomIntFromInterval(1950, new Date().getFullYear());
-    console.log(randomYear);
+    // console.log(randomYear);
+    // console.log("Token, ", API_TOKEN);
 
     fetch(
-      `https://www.omdbapi.com/?apikey=${key}&s=movie&y=${randomYear}&type=movie`
+      `https://www.omdbapi.com/?apikey=${API_TOKEN}&s=movie&y=${randomYear}&type=movie`
     )
       .then((response) => {
         if (!response.ok) {
@@ -47,7 +49,7 @@ export default function App() {
         if (data.Response === "False") {
           getCurrentMovie();
         } else {
-          setCurrentMovie(data.Search[1]);
+          setCurrentMovie(data.Search[0]);
           console.log(data);
           getNextMovie();
         }
@@ -63,7 +65,7 @@ export default function App() {
     console.log(randomYear);
 
     fetch(
-      `https://www.omdbapi.com/?apikey=${key}&s=movie&y=${randomYear}&type=movie`
+      `https://www.omdbapi.com/?apikey=${API_TOKEN}&s=movie&y=${randomYear}&type=movie`
     )
       .then((response) => {
         if (!response.ok) {
@@ -75,7 +77,7 @@ export default function App() {
         if (data.Response === "False") {
           getNextMovie();
         } else {
-          setNextMovie(data.Search[1]);
+          setNextMovie(data.Search[0]);
           console.log(data);
         }
       })
@@ -87,41 +89,62 @@ export default function App() {
 
   function before() {
     console.log("Before");
-    if (currentMovie?.Year > nextMovie?.Year) {
-      setScore(score + 1);
-      setCurrentMovie(nextMovie);
-      getNextMovie();
-    } else {
-      setScore(0);
-      toggleStartPage(true);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      storeScore(score);
-    }
+    if (currentMovie && nextMovie)
+      if (currentMovie?.Year > nextMovie?.Year) {
+        setScore(score + 1);
+        setCurrentMovie(nextMovie);
+        getNextMovie();
+      } else {
+        setScore(0);
+        toggleStartPage(true);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        storeScore(score);
+      }
   }
 
   function after() {
     console.log("After");
-    if (currentMovie?.Year < nextMovie?.Year) {
-      setScore(score + 1);
-      setCurrentMovie(nextMovie);
-      getNextMovie();
-    } else {
-      setScore(0);
-      toggleStartPage(true);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      storeScore(score);
-    }
+    if (currentMovie && nextMovie)
+      if (currentMovie?.Year < nextMovie?.Year) {
+        setScore(score + 1);
+        setCurrentMovie(nextMovie);
+        getNextMovie();
+      } else {
+        setScore(0);
+        toggleStartPage(true);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        storeScore(score);
+      }
   }
 
   const storeScore = async (scoreToStore: number) => {
-    try {
-      const jsonValue = JSON.stringify(scoreToStore);
-      await AsyncStorage.setItem("scoreMovie", jsonValue);
-      console.log("Saved Score: ", scoreToStore);
-    } catch (e) {
-      console.error("Fehler beim Speichern des Scores:", e);
+    if (scoreToStore > highScore) {
+      try {
+        const jsonValue = JSON.stringify(scoreToStore);
+        await AsyncStorage.setItem("scoreMovie", jsonValue);
+        console.log("Saved Score: ", scoreToStore);
+        setHighScore(scoreToStore);
+      } catch (e) {
+        console.error("Fehler beim Speichern des Scores:", e);
+      }
     }
   };
+
+  useEffect(() => {
+    const loadScore = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("scoreMovie");
+        if (jsonValue !== null) {
+          console.log("Loaded Score: ", JSON.parse(jsonValue));
+          setHighScore(JSON.parse(jsonValue));
+        }
+      } catch (e) {
+        console.error("Fehler beim Laden der Allergene:", e);
+      }
+    };
+
+    loadScore();
+  }, []);
 
   return (
     <View style={styles.main}>
