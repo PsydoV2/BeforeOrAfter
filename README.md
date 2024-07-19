@@ -47,6 +47,14 @@ Folge diesen Schritten, um die App auf deinem lokalen Rechner einzurichten:
 - **AsyncStorage:** Zur persistenten Speicherung von Highscores.
 - **OMDb API:** Zum Abrufen von Filmdaten.
 
+## Preview
+Benötigt ExpoGo App
+
+iOS -> Mit der Kamera scannen <br>
+Android -> Mit der ExpoGo App scannen
+![image](https://github.com/user-attachments/assets/2995fc47-def9-4f95-8fdf-aacc174f0b29)
+
+
 ## Lizenz
 
 Dieses Projekt ist unter der MIT-Lizenz lizenziert. Siehe die [LICENSE](LICENSE) Datei für Details.
