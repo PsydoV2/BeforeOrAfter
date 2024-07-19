@@ -1,19 +1,38 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Haptics from "expo-haptics";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface StartPageProps {
   handelToggle: () => void;
 }
 
 export default function StartPage(props: StartPageProps) {
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    const loadScore = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("scoreMovie");
+        if (jsonValue !== null) {
+          console.log("Loaded Score: ", JSON.parse(jsonValue));
+          setScore(JSON.parse(jsonValue));
+        }
+      } catch (e) {
+        console.error("Fehler beim Laden der Allergene:", e);
+      }
+    };
+
+    loadScore();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         <Text style={{ color: "green", fontWeight: "900" }}>Before</Text> OR{" "}
         <Text style={{ color: "red", fontWeight: "900" }}>After</Text>
       </Text>
-      <Text style={styles.highScore}>Highscore: 234</Text>
+      <Text style={styles.highScore}>Highscore: {score}</Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => {

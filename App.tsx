@@ -9,9 +9,10 @@ import {
 import StartPage from "./components/StartPage";
 import { useEffect, useState } from "react";
 import * as Haptics from "expo-haptics";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface MovieProps {
-  poster: string;
+  Poster: string;
   Title: string;
   type: string;
   Year: string;
@@ -94,6 +95,7 @@ export default function App() {
       setScore(0);
       toggleStartPage(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      storeScore(score);
     }
   }
 
@@ -107,8 +109,19 @@ export default function App() {
       setScore(0);
       toggleStartPage(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      storeScore(score);
     }
   }
+
+  const storeScore = async (scoreToStore: number) => {
+    try {
+      const jsonValue = JSON.stringify(scoreToStore);
+      await AsyncStorage.setItem("scoreMovie", jsonValue);
+      console.log("Saved Score: ", scoreToStore);
+    } catch (e) {
+      console.error("Fehler beim Speichern des Scores:", e);
+    }
+  };
 
   return (
     <View style={styles.main}>
@@ -123,25 +136,40 @@ export default function App() {
       <StatusBar style="light" />
 
       <View style={styles.topMovieCon}>
-        {/* <ImageBackground source={currentMovie?.poster}></ImageBackground> */}
-        <Text style={styles.movieTitle}>{currentMovie?.Title}</Text>
-        <Text>was released</Text>
-        <Text>{currentMovie?.Year}</Text>
+        <ImageBackground
+          style={styles.backgroundPoster}
+          source={{ uri: currentMovie?.Poster }}
+        ></ImageBackground>
+        <View style={styles.movieContent}>
+          <Text style={styles.movieTitle}>{currentMovie?.Title}</Text>
+          <Text style={styles.textMid}>was released</Text>
+          <Text style={styles.movieYear}>{currentMovie?.Year}</Text>
+        </View>
       </View>
 
       <View style={styles.divider}></View>
       <Text style={styles.dividerText}>VS</Text>
 
       <View style={styles.bottomMovieCon}>
-        <Text style={styles.movieTitle}>{nextMovie?.Title}</Text>
-        <Text>was</Text>
-        <TouchableOpacity style={styles.buttonHigher} onPress={() => before()}>
-          <Text style={styles.buttonText}>Before</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonLower} onPress={() => after()}>
-          <Text style={styles.buttonText}>After</Text>
-        </TouchableOpacity>
-        <Text>{currentMovie?.Year} released</Text>
+        <ImageBackground
+          style={styles.backgroundPoster}
+          source={{ uri: nextMovie?.Poster }}
+        ></ImageBackground>
+
+        <View style={styles.movieContent}>
+          <Text style={styles.movieTitle}>{nextMovie?.Title}</Text>
+          <Text style={styles.textMid}>was</Text>
+          <TouchableOpacity
+            style={styles.buttonHigher}
+            onPress={() => before()}
+          >
+            <Text style={styles.buttonText}>Before</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonLower} onPress={() => after()}>
+            <Text style={styles.buttonText}>After</Text>
+          </TouchableOpacity>
+          <Text style={styles.movieYear}>{currentMovie?.Year} released</Text>
+        </View>
       </View>
 
       <Text style={styles.score}>Score: {score}</Text>
@@ -151,15 +179,18 @@ export default function App() {
 
 const styles = StyleSheet.create({
   main: {
-    position: "relative",
+    flex: 1,
     backgroundColor: "black",
-    height: "100%",
+  },
+  backgroundPoster: {
     width: "100%",
+    height: "100%",
+    position: "absolute",
   },
   topMovieCon: {
     width: "100%",
     height: "49.5%",
-    backgroundColor: "red",
+    backgroundColor: "black",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -169,12 +200,22 @@ const styles = StyleSheet.create({
   bottomMovieCon: {
     width: "100%",
     height: "49.5%",
-    backgroundColor: "blue",
+    backgroundColor: "rgba(0, 0, 255, 0.5)",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     gap: 20,
+  },
+  movieContent: {
+    height: "100%",
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   divider: {
     width: "100%",
@@ -202,6 +243,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "white",
     fontWeight: "900",
+    textAlign: "center",
+    width: "80%",
   },
   buttonHigher: {
     backgroundColor: "transparent",
@@ -238,5 +281,14 @@ const styles = StyleSheet.create({
     bottom: 20,
     left: 50,
     fontSize: 20,
+  },
+  textMid: {
+    color: "white",
+    fontSize: 20,
+  },
+  movieYear: {
+    color: "white",
+    fontSize: 25,
+    fontWeight: "900",
   },
 });
