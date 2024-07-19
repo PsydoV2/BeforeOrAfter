@@ -7,15 +7,8 @@ interface StartPageProps {
 }
 
 export default function StartPage(props: StartPageProps) {
-  const [showStartPage, toggleStartPage] = useState(true);
-
   return (
-    <View
-      style={[
-        styles.container,
-        showStartPage ? { display: "flex" } : { display: "none" },
-      ]}
-    >
+    <View style={styles.container}>
       <Text style={styles.title}>
         <Text style={{ color: "green", fontWeight: "900" }}>Before</Text> OR{" "}
         <Text style={{ color: "red", fontWeight: "900" }}>After</Text>
@@ -24,7 +17,6 @@ export default function StartPage(props: StartPageProps) {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          toggleStartPage(false);
           props.handelToggle();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import StartPage from "./components/StartPage";
 import { useEffect, useState } from "react";
+import * as Haptics from "expo-haptics";
 
 interface MovieProps {
   poster: string;
@@ -18,9 +19,11 @@ interface MovieProps {
 }
 
 export default function App() {
+  const [showStartPage, toggleStartPage] = useState(true);
   const key = "ba5bd1b3";
   const [currentMovie, setCurrentMovie] = useState<MovieProps>();
   const [nextMovie, setNextMovie] = useState<MovieProps>();
+  const [score, setScore] = useState(0);
 
   function randomIntFromInterval(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -43,7 +46,7 @@ export default function App() {
         if (data.Response === "False") {
           getCurrentMovie();
         } else {
-          setCurrentMovie(data);
+          setCurrentMovie(data.Search[1]);
           console.log(data);
           getNextMovie();
         }
@@ -71,7 +74,7 @@ export default function App() {
         if (data.Response === "False") {
           getNextMovie();
         } else {
-          setNextMovie(data);
+          setNextMovie(data.Search[1]);
           console.log(data);
         }
       })
@@ -81,9 +84,42 @@ export default function App() {
       });
   }
 
+  function before() {
+    console.log("Before");
+    if (currentMovie?.Year > nextMovie?.Year) {
+      setScore(score + 1);
+      setCurrentMovie(nextMovie);
+      getNextMovie();
+    } else {
+      setScore(0);
+      toggleStartPage(true);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    }
+  }
+
+  function after() {
+    console.log("After");
+    if (currentMovie?.Year < nextMovie?.Year) {
+      setScore(score + 1);
+      setCurrentMovie(nextMovie);
+      getNextMovie();
+    } else {
+      setScore(0);
+      toggleStartPage(true);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    }
+  }
+
   return (
     <View style={styles.main}>
-      <StartPage handelToggle={() => getCurrentMovie()}></StartPage>
+      {showStartPage && (
+        <StartPage
+          handelToggle={() => {
+            getCurrentMovie();
+            toggleStartPage(false);
+          }}
+        ></StartPage>
+      )}
       <StatusBar style="light" />
 
       <View style={styles.topMovieCon}>
@@ -99,14 +135,16 @@ export default function App() {
       <View style={styles.bottomMovieCon}>
         <Text style={styles.movieTitle}>{nextMovie?.Title}</Text>
         <Text>was</Text>
-        <TouchableOpacity style={styles.buttonHigher}>
+        <TouchableOpacity style={styles.buttonHigher} onPress={() => before()}>
           <Text style={styles.buttonText}>Before</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonLower}>
+        <TouchableOpacity style={styles.buttonLower} onPress={() => after()}>
           <Text style={styles.buttonText}>After</Text>
         </TouchableOpacity>
         <Text>{currentMovie?.Year} released</Text>
       </View>
+
+      <Text style={styles.score}>Score: {score}</Text>
     </View>
   );
 }
@@ -193,5 +231,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     fontWeight: "bold",
+  },
+  score: {
+    color: "black",
+    position: "absolute",
+    bottom: 20,
+    left: 50,
+    fontSize: 20,
   },
 });

@@ -1,1 +1,76 @@
-{ "Error": "Incorrect IMDb ID.", "Response": "False" }
+{
+  "Response": "True",
+  "Search": [
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BNDc5ZWE2ZTMtMzFhNy00NDEyLWEyYjEtNmEyZDUzYmY3OWIyXkEyXkFqcGdeQXVyMTUzMDUzNTI3._V1_SX300.jpg",
+      "Title": "Cheech and Chong's Next Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0080520"
+    },
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BY2I1ZGNjYjUtZGRjOC00YTQ1LWE5ZDMtYTRmYzQ3YjE4MTBmXkEyXkFqcGdeQXVyODkxMTU1Njc@._V1_SX300.jpg",
+      "Title": "The Gong Show Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0080808"
+    },
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BODI1MWFlMzAtNTFjZC00Nzc5LTliYzAtMDZmNmFiNzU4MjBmL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMTEyMDcwNw@@._V1_SX300.jpg",
+      "Title": "The Making of Superman: The Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0319796"
+    },
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BZTBlOThmNjctYzI3Zi00MjU0LWFhNWEtNmE3Y2Y0Y2U2MTY2XkEyXkFqcGdeQXVyOTA0MzY4MjY@._V1_SX300.jpg",
+      "Title": "Denshi Sentai Denjiman: The Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt1841562"
+    },
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BMzAwN2Q5YjUtYjNiOC00NGIyLTk3MGEtZmZkMWZlZTgxNTA4XkEyXkFqcGdeQXVyNTgwNzg3MzY@._V1_SX300.jpg",
+      "Title": "From the Apennines to the Andes: The Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt11512640"
+    },
+    {
+      "Poster": "N/A",
+      "Title": "Ann-Margret: Hollywood Movie Girls",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0334902"
+    },
+    {
+      "Poster": "N/A",
+      "Title": "The American Movie Awards",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0355188"
+    },
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BNzllOGFmNzQtYjllNi00ZGJjLWEyZTAtMWIwMzZmNGE0OTJkXkEyXkFqcGdeQXVyMTEwODg2MDY@._V1_SX300.jpg",
+      "Title": "Making Xanadu: The Musical Fantasy Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt5613660"
+    },
+    {
+      "Poster": "https://m.media-amazon.com/images/M/MV5BMTgwODc4MzgxNV5BMl5BanBnXkFtZTcwNjU3NDMyMQ@@._V1_SX300.jpg",
+      "Title": "The Funniest Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0121811"
+    },
+    {
+      "Poster": "N/A",
+      "Title": "Class Project: The Garbage Movie",
+      "Type": "movie",
+      "Year": "1980",
+      "imdbID": "tt0225404"
+    }
+  ],
+  "totalResults": "23"
+}
