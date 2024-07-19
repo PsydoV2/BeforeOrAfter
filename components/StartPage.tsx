@@ -1,22 +1,31 @@
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Haptics from "expo-haptics";
+import { useState } from "react";
 
 interface StartPageProps {
   handelToggle: () => void;
 }
 
 export default function StartPage(props: StartPageProps) {
+  const [showStartPage, toggleStartPage] = useState(true);
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        showStartPage ? { display: "flex" } : { display: "none" },
+      ]}
+    >
       <Text style={styles.title}>
-        <Text style={{ color: "green" }}>Higher</Text> OR{" "}
-        <Text style={{ color: "red" }}>Lower</Text>
+        <Text style={{ color: "green", fontWeight: "900" }}>Before</Text> OR{" "}
+        <Text style={{ color: "red", fontWeight: "900" }}>After</Text>
       </Text>
       <Text style={styles.highScore}>Highscore: 234</Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          props.handelToggle;
+          toggleStartPage(false);
+          props.handelToggle();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}
       >
@@ -35,7 +44,7 @@ const styles = StyleSheet.create({
     left: 0,
     backgroundColor: "black",
 
-    display: "flex",
+    // display: "flex",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
