@@ -52,6 +52,7 @@ Benötigt ExpoGo App
 
 iOS -> Mit der Kamera scannen <br>
 Android -> Mit der ExpoGo App scannen
+
 ![image](https://github.com/user-attachments/assets/2995fc47-def9-4f95-8fdf-aacc174f0b29)
 
 
