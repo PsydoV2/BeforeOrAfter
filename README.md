@@ -55,6 +55,8 @@ Android -> Mit der ExpoGo App scannen
 
 ![image](https://github.com/user-attachments/assets/2995fc47-def9-4f95-8fdf-aacc174f0b29)
 
+[img]https://i.imgur.com/Afs94lj.png[/img]
+
 
 ## Lizenz
 
