@@ -40,37 +40,6 @@ Folge diesen Schritten, um die App auf deinem lokalen Rechner einzurichten:
 
    Dies startet den Expo-Entwicklungsserver. Du kannst dann die Expo Go App auf deinem mobilen Gerät verwenden, um den QR-Code zu scannen und die App auszuführen.
 
-## Nutzung
-
-1. **Spiel starten:**
-   - Wenn du die App öffnest, siehst du eine Startseite. Klicke auf den Button, um das Spiel zu starten.
-2. **Veröffentlichungsreihenfolge raten:**
-
-   - Dir werden zwei Filme angezeigt. Ein Film wird oben und der andere unten angezeigt.
-   - Rate, ob der untere Film vor oder nach dem oberen veröffentlicht wurde, indem du auf die Buttons "Before" oder "After" klickst.
-
-3. **Punkte sammeln:**
-
-   - Wenn deine Vermutung richtig ist, erhöht sich dein Punktestand um eins und ein neues Filmpaar wird angezeigt.
-   - Wenn deine Vermutung falsch ist, endet das Spiel und dein Punktestand wird mit deinem Highscore verglichen.
-
-4. **Highscore anzeigen:**
-   - Dein Highscore wird gespeichert und kann auf der Startseite angezeigt werden, wenn du das Spiel neu startest.
-
-## Code-Übersicht
-
-### Hauptkomponenten
-
-- **App.tsx:** Die Hauptkomponente, die die Spiellogik, das Abrufen von Filmdaten, die Zustandsverwaltung und das Rendern der Benutzeroberfläche übernimmt.
-- **StartPage.tsx:** Eine einfache Startseitenkomponente, die die Sichtbarkeit des Spiels umschaltet.
-
-### Funktionen
-
-- **randomIntFromInterval:** Generiert eine zufällige Ganzzahl innerhalb eines gegebenen Bereichs.
-- **getCurrentMovie & getNextMovie:** Ruft einen zufälligen Film von der OMDb API basierend auf einem zufälligen Jahr ab.
-- **before & after:** Übernimmt die Logik für das Raten, ob der untere Film vor oder nach dem oberen veröffentlicht wurde.
-- **storeScore & loadScore:** Verwaltet das Speichern und Laden des Highscores mit AsyncStorage.
-
 ## Abhängigkeiten
 
 - **React & React Native:** Kernbibliotheken zum Erstellen der App.
