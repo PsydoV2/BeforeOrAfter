@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Before OR After",
-    "slug": "Before OR After",
+    "slug": "BeforeORAfter",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,6 +22,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d046b29b-20b1-43b5-be11-0eb2973af7a4"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d046b29b-20b1-43b5-be11-0eb2973af7a4"
     }
   }
 }
