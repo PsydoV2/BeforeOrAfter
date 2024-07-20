@@ -1,7 +1,15 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ImageBackground,
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import imageBack from "../assets/menuBack.png";
 
 interface StartPageProps {
   handelToggle: () => void;
@@ -28,6 +36,10 @@ export default function StartPage(props: StartPageProps) {
 
   return (
     <View style={styles.container}>
+      <ImageBackground
+        style={styles.imageBack}
+        source={imageBack}
+      ></ImageBackground>
       <Text style={styles.title}>
         <Text style={{ color: "green", fontWeight: "900" }}>Before</Text> OR{" "}
         <Text style={{ color: "red", fontWeight: "900" }}>After</Text>
@@ -84,5 +96,10 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontSize: 25,
     fontFamily: "normal",
+  },
+  imageBack: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
   },
 });

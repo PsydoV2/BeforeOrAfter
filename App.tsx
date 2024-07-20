@@ -11,9 +11,13 @@ import { useEffect, useState } from "react";
 import * as Haptics from "expo-haptics";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_TOKEN } from "@env";
+import { Circle } from "react-native-progress";
+import { Feather } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 interface MovieProps {
   Poster: string;
+  Search: [Title: string, type: string, Year: string, imdbID: string];
   Title: string;
   type: string;
   Year: string;
@@ -22,10 +26,11 @@ interface MovieProps {
 
 export default function App() {
   const [showStartPage, toggleStartPage] = useState(true);
-  const [currentMovie, setCurrentMovie] = useState<MovieProps>();
-  const [nextMovie, setNextMovie] = useState<MovieProps>();
+  const [currentMovie, setCurrentMovie] = useState<MovieProps | null>(null);
+  const [nextMovie, setNextMovie] = useState<MovieProps | null>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
+  const [showEndScreen, toggleEndScreen] = useState(false);
 
   function randomIntFromInterval(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
@@ -49,9 +54,15 @@ export default function App() {
         if (data.Response === "False") {
           getCurrentMovie();
         } else {
-          setCurrentMovie(data.Search[0]);
-          console.log(data);
-          getNextMovie();
+          const index = randomIntFromInterval(0, data.Search.length);
+
+          if (data.Search[index].Poster == "N/A") {
+            getCurrentMovie();
+          } else {
+            setCurrentMovie(data.Search[index]);
+            console.log(data);
+            getNextMovie();
+          }
         }
       })
       .catch((error) => {
@@ -77,8 +88,14 @@ export default function App() {
         if (data.Response === "False") {
           getNextMovie();
         } else {
-          setNextMovie(data.Search[0]);
-          console.log(data);
+          const index = randomIntFromInterval(0, data.Search.length);
+
+          if (data.Search[index].Poster == "N/A") {
+            getNextMovie();
+          } else {
+            setNextMovie(data.Search[index]);
+            console.log(data);
+          }
         }
       })
       .catch((error) => {
@@ -87,18 +104,33 @@ export default function App() {
       });
   }
 
+  function goHome() {
+    toggleStartPage(true);
+    setNextMovie(null);
+    setCurrentMovie(null);
+    toggleEndScreen(false);
+  }
+
+  function retry() {
+    toggleEndScreen(false);
+    setCurrentMovie(null);
+    getCurrentMovie();
+    setNextMovie(null);
+  }
+
   function before() {
     console.log("Before");
     if (currentMovie && nextMovie)
       if (currentMovie?.Year > nextMovie?.Year) {
         setScore(score + 1);
         setCurrentMovie(nextMovie);
+        setNextMovie(null);
         getNextMovie();
       } else {
         setScore(0);
-        toggleStartPage(true);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         storeScore(score);
+        toggleEndScreen(true);
       }
   }
 
@@ -108,12 +140,13 @@ export default function App() {
       if (currentMovie?.Year < nextMovie?.Year) {
         setScore(score + 1);
         setCurrentMovie(nextMovie);
+        setNextMovie(null);
         getNextMovie();
       } else {
         setScore(0);
-        toggleStartPage(true);
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         storeScore(score);
+        toggleEndScreen(true);
       }
   }
 
@@ -159,43 +192,95 @@ export default function App() {
       <StatusBar style="light" />
 
       <View style={styles.topMovieCon}>
-        <ImageBackground
-          style={styles.backgroundPoster}
-          source={{ uri: currentMovie?.Poster }}
-        ></ImageBackground>
-        <View style={styles.movieContent}>
-          <Text style={styles.movieTitle}>{currentMovie?.Title}</Text>
-          <Text style={styles.textMid}>was released</Text>
-          <Text style={styles.movieYear}>{currentMovie?.Year}</Text>
-        </View>
+        {currentMovie != null ? (
+          <>
+            <ImageBackground
+              style={styles.backgroundPoster}
+              source={{ uri: currentMovie?.Poster }}
+            ></ImageBackground>
+            <View style={styles.movieContent}>
+              <Text style={styles.movieTitle}>{currentMovie?.Title}</Text>
+              <Text style={styles.textMid}>was released</Text>
+              <Text style={styles.movieYear}>{currentMovie?.Year}</Text>
+            </View>
+          </>
+        ) : (
+          <View style={styles.loadingCon}>
+            <Circle
+              size={150}
+              indeterminate={true}
+              color="white"
+              borderWidth={5}
+            />
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.divider}></View>
       <Text style={styles.dividerText}>VS</Text>
 
       <View style={styles.bottomMovieCon}>
-        <ImageBackground
-          style={styles.backgroundPoster}
-          source={{ uri: nextMovie?.Poster }}
-        ></ImageBackground>
+        {nextMovie != null ? (
+          <>
+            <ImageBackground
+              style={styles.backgroundPoster}
+              source={{ uri: nextMovie?.Poster }}
+            ></ImageBackground>
 
-        <View style={styles.movieContent}>
-          <Text style={styles.movieTitle}>{nextMovie?.Title}</Text>
-          <Text style={styles.textMid}>was</Text>
-          <TouchableOpacity
-            style={styles.buttonHigher}
-            onPress={() => before()}
-          >
-            <Text style={styles.buttonText}>Before</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonLower} onPress={() => after()}>
-            <Text style={styles.buttonText}>After</Text>
-          </TouchableOpacity>
-          <Text style={styles.movieYear}>{currentMovie?.Year} released</Text>
-        </View>
+            <View style={styles.movieContent}>
+              <Text style={styles.movieTitle}>{nextMovie?.Title}</Text>
+              <Text style={styles.textMid}>was</Text>
+              <TouchableOpacity
+                style={styles.buttonHigher}
+                onPress={() => before()}
+              >
+                <Text style={styles.buttonText}>Before</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.buttonLower}
+                onPress={() => after()}
+              >
+                <Text style={styles.buttonText}>After</Text>
+              </TouchableOpacity>
+              <Text style={styles.movieYear}>
+                {currentMovie?.Year} released
+              </Text>
+            </View>
+          </>
+        ) : (
+          <View style={styles.loadingCon}>
+            <Circle
+              size={150}
+              indeterminate={true}
+              color="white"
+              borderWidth={5}
+            />
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        )}
       </View>
 
-      <Text style={styles.score}>Score: {score}</Text>
+      {showEndScreen && (
+        <View style={styles.endCon}>
+          <View style={styles.endScreen}>
+            <Text style={styles.endText}>Wrong!</Text>
+            <Text>
+              {nextMovie?.Title} was {nextMovie?.Year} released
+            </Text>
+            <View style={styles.endButtCon}>
+              <TouchableOpacity style={styles.endButt} onPress={goHome}>
+                <Feather name="home" size={25} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.endButt} onPress={retry}>
+                <Ionicons name="reload" size={25} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* <Text style={styles.score}>Score: {score}</Text> */}
     </View>
   );
 }
@@ -313,5 +398,65 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 25,
     fontWeight: "900",
+  },
+  loadingCon: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
+  loadingText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "900",
+    marginTop: 20,
+  },
+  endCon: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 22,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+  },
+  endScreen: {
+    width: "80%",
+    height: "20%",
+    backgroundColor: "white",
+    zIndex: 22,
+    borderRadius: 20,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+  },
+  endText: {
+    color: "red",
+    fontSize: 20,
+    fontWeight: "900",
+    marginBottom: 20,
+  },
+  endButtCon: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    flexDirection: "row",
+    marginTop: 20,
+  },
+  endButt: {
+    height: 40,
+    width: 40,
+    backgroundColor: "black",
+    borderRadius: 8,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
