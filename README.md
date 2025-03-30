@@ -48,6 +48,7 @@ Folge diesen Schritten, um die App auf deinem lokalen Rechner einzurichten:
 - **OMDb API:** Zum Abrufen von Filmdaten.
 
 ## Preview
+
 Benötigt ExpoGo App
 
 iOS -> Mit der Kamera scannen <br>
@@ -56,7 +57,6 @@ Android -> Mit der ExpoGo App scannen
 ![image](https://github.com/user-attachments/assets/178d90d5-ab69-4085-9beb-f844fbc23154)
 
 ![img](https://i.imgur.com/Afs94lj.png)
-
 
 ## Lizenz
 

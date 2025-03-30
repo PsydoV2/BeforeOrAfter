@@ -1,39 +1,38 @@
 {
   "expo": {
-    "name": "Before OR After",
-    "slug": "BeforeORAfter",
-    "version": "1.0.1",
+    "name": "myapp",
+    "slug": "myapp",
+    "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "experimental": {
+      "newArchEnabled": true
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.psydo.BeforeORAfter"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "d046b29b-20b1-43b5-be11-0eb2973af7a4"
       }
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
     },
-    "updates": {
-      "url": "https://u.expo.dev/d046b29b-20b1-43b5-be11-0eb2973af7a4"
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

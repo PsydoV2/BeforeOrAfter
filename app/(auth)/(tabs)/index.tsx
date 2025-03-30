@@ -1,154 +1,91 @@
-import { StatusBar } from "expo-status-bar";
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import StartPage from "./components/StartPage";
-import { useEffect, useState } from "react";
+import { ImageBackground, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View } from "@/components/Themed";
+import { useSession } from "@/src/context/ctx";
 import * as Haptics from "expo-haptics";
+import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StatusBar } from "expo-status-bar";
 import { API_TOKEN } from "@env";
 import { Circle } from "react-native-progress";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import GameOver from "@/components/GameOver";
 
 interface MovieProps {
-  Poster: string;
-  Search: [Title: string, type: string, Year: string, imdbID: string];
   Title: string;
-  type: string;
   Year: string;
   imdbID: string;
+  type: string;
+  Poster: string;
 }
 
-export default function App() {
-  const [showStartPage, toggleStartPage] = useState(true);
+export default function TabOneScreen() {
+  const { signOut, session } = useSession();
   const [currentMovie, setCurrentMovie] = useState<MovieProps | null>(null);
   const [nextMovie, setNextMovie] = useState<MovieProps | null>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [showEndScreen, toggleEndScreen] = useState(false);
 
-  function randomIntFromInterval(min: number, max: number) {
+  useEffect(() => {
+    if (!currentMovie) getMovie(setCurrentMovie);
+    if (!nextMovie) getMovie(setNextMovie);
+    console.log("start game");
+    console.log(currentMovie);
+    console.log(nextMovie);
+    console.log(API_TOKEN);
+  }, []);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const val = await AsyncStorage.getItem("scoreMovie");
+        const parsed = val ? JSON.parse(val) : 0;
+        setScore(parsed);
+        setHighScore(parsed);
+      } catch (e) {
+        console.error("Fehler beim Laden des Scores", e);
+      }
+    };
+    load();
+  }, []);
+
+  const randomIntFromInterval = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+  };
 
-  function getCurrentMovie() {
-    const randomYear = randomIntFromInterval(1950, new Date().getFullYear());
-    // console.log(randomYear);
-    // console.log("Token, ", API_TOKEN);
+  const getMovie = async (setter: (movie: MovieProps) => void) => {
+    try {
+      const randomYear = randomIntFromInterval(1950, new Date().getFullYear());
+      const res = await fetch(
+        `https://www.omdbapi.com/?apikey=${API_TOKEN}&s=movie&y=${randomYear}&type=movie`
+      );
+      const data = await res.json();
 
-    fetch(
-      `https://www.omdbapi.com/?apikey=${API_TOKEN}&s=movie&y=${randomYear}&type=movie`
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.Response === "False") {
-          getCurrentMovie();
-        } else {
-          const index = randomIntFromInterval(0, data.Search.length);
+      if (data.Response === "False" || !data.Search?.length) {
+        return getMovie(setter);
+      }
 
-          if (data.Search[index].Poster == "N/A") {
-            getCurrentMovie();
-          } else {
-            setCurrentMovie(data.Search[index]);
-            console.log(data);
-            getNextMovie();
-          }
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        getCurrentMovie();
-      });
-  }
+      const index = randomIntFromInterval(0, data.Search.length - 1);
+      const movie = data.Search[index];
 
-  function getNextMovie() {
-    const randomYear = randomIntFromInterval(1950, new Date().getFullYear());
-    console.log(randomYear);
+      if (!movie || movie.Poster === "N/A") {
+        return getMovie(setter);
+      }
 
-    fetch(
-      `https://www.omdbapi.com/?apikey=${API_TOKEN}&s=movie&y=${randomYear}&type=movie`
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.Response === "False") {
-          getNextMovie();
-        } else {
-          const index = randomIntFromInterval(0, data.Search.length);
+      setter(movie);
+    } catch (err) {
+      console.error("API Error", err);
+      getMovie(setter);
+    }
+  };
 
-          if (data.Search[index].Poster == "N/A") {
-            getNextMovie();
-          } else {
-            setNextMovie(data.Search[index]);
-            console.log(data);
-          }
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        getNextMovie();
-      });
-  }
-
-  function goHome() {
-    toggleStartPage(true);
-    setNextMovie(null);
-    setCurrentMovie(null);
-    toggleEndScreen(false);
-  }
-
-  function retry() {
+  const retry = () => {
     toggleEndScreen(false);
     setCurrentMovie(null);
-    getCurrentMovie();
+    getMovie(setCurrentMovie);
     setNextMovie(null);
-  }
-
-  function before() {
-    console.log("Before");
-    if (currentMovie && nextMovie)
-      if (currentMovie?.Year > nextMovie?.Year) {
-        setScore(score + 1);
-        setCurrentMovie(nextMovie);
-        setNextMovie(null);
-        getNextMovie();
-      } else {
-        setScore(0);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        storeScore(score);
-        toggleEndScreen(true);
-      }
-  }
-
-  function after() {
-    console.log("After");
-    if (currentMovie && nextMovie)
-      if (currentMovie?.Year < nextMovie?.Year) {
-        setScore(score + 1);
-        setCurrentMovie(nextMovie);
-        setNextMovie(null);
-        getNextMovie();
-      } else {
-        setScore(0);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        storeScore(score);
-        toggleEndScreen(true);
-      }
-  }
+  };
 
   const storeScore = async (scoreToStore: number) => {
     if (scoreToStore > highScore) {
@@ -163,84 +100,80 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    const loadScore = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("scoreMovie");
-        if (jsonValue !== null) {
-          console.log("Loaded Score: ", JSON.parse(jsonValue));
-          setHighScore(JSON.parse(jsonValue));
-        }
-      } catch (e) {
-        console.error("Fehler beim Laden der Allergene:", e);
+  const before = () => {
+    if (currentMovie && nextMovie) {
+      if (parseInt(currentMovie.Year) > parseInt(nextMovie.Year)) {
+        setScore(score + 1);
+        setCurrentMovie(nextMovie);
+        setNextMovie(null);
+        getMovie(setNextMovie);
+      } else {
+        setScore(0);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        storeScore(score);
+        toggleEndScreen(true);
       }
-    };
+    }
+  };
 
-    loadScore();
-  }, []);
+  const after = () => {
+    if (currentMovie && nextMovie) {
+      if (parseInt(currentMovie.Year) < parseInt(nextMovie.Year)) {
+        setScore(score + 1);
+        setCurrentMovie(nextMovie);
+        setNextMovie(null);
+        getMovie(setNextMovie);
+      } else {
+        setScore(0);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        storeScore(score);
+        toggleEndScreen(true);
+      }
+    }
+  };
 
   return (
     <View style={styles.main}>
-      {showStartPage && (
-        <StartPage
-          handelToggle={() => {
-            getCurrentMovie();
-            toggleStartPage(false);
-          }}
-        ></StartPage>
-      )}
       <StatusBar style="light" />
 
       <View style={styles.topMovieCon}>
-        {currentMovie != null ? (
+        {currentMovie ? (
           <>
             <ImageBackground
               style={styles.backgroundPoster}
-              source={{ uri: currentMovie?.Poster }}
-            ></ImageBackground>
+              source={{ uri: currentMovie.Poster }}
+            />
             <View style={styles.movieContent}>
-              <Text style={styles.movieTitle}>{currentMovie?.Title}</Text>
+              <Text style={styles.movieTitle}>{currentMovie.Title}</Text>
               <Text style={styles.textMid}>was released</Text>
-              <Text style={styles.movieYear}>{currentMovie?.Year}</Text>
+              <Text style={styles.movieYear}>{currentMovie.Year}</Text>
             </View>
           </>
         ) : (
           <View style={styles.loadingCon}>
-            <Circle
-              size={150}
-              indeterminate={true}
-              color="white"
-              borderWidth={5}
-            />
+            <Circle size={150} indeterminate color="white" borderWidth={5} />
             <Text style={styles.loadingText}>Loading...</Text>
           </View>
         )}
       </View>
 
-      <View style={styles.divider}></View>
+      <View style={styles.divider} />
       <Text style={styles.dividerText}>VS</Text>
 
       <View style={styles.bottomMovieCon}>
-        {nextMovie != null ? (
+        {nextMovie ? (
           <>
             <ImageBackground
               style={styles.backgroundPoster}
-              source={{ uri: nextMovie?.Poster }}
-            ></ImageBackground>
-
+              source={{ uri: nextMovie.Poster }}
+            />
             <View style={styles.movieContent}>
-              <Text style={styles.movieTitle}>{nextMovie?.Title}</Text>
+              <Text style={styles.movieTitle}>{nextMovie.Title}</Text>
               <Text style={styles.textMid}>was</Text>
-              <TouchableOpacity
-                style={styles.buttonHigher}
-                onPress={() => before()}
-              >
+              <TouchableOpacity style={styles.buttonHigher} onPress={before}>
                 <Text style={styles.buttonText}>Before</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.buttonLower}
-                onPress={() => after()}
-              >
+              <TouchableOpacity style={styles.buttonLower} onPress={after}>
                 <Text style={styles.buttonText}>After</Text>
               </TouchableOpacity>
               <Text style={styles.movieYear}>
@@ -250,37 +183,13 @@ export default function App() {
           </>
         ) : (
           <View style={styles.loadingCon}>
-            <Circle
-              size={150}
-              indeterminate={true}
-              color="white"
-              borderWidth={5}
-            />
+            <Circle size={150} indeterminate color="white" borderWidth={5} />
             <Text style={styles.loadingText}>Loading...</Text>
           </View>
         )}
       </View>
 
-      {showEndScreen && (
-        <View style={styles.endCon}>
-          <View style={styles.endScreen}>
-            <Text style={styles.endText}>Wrong!</Text>
-            <Text>
-              {nextMovie?.Title} was {nextMovie?.Year} released
-            </Text>
-            <View style={styles.endButtCon}>
-              <TouchableOpacity style={styles.endButt} onPress={goHome}>
-                <Feather name="home" size={25} color="white" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.endButt} onPress={retry}>
-                <Ionicons name="reload" size={25} color="white" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      )}
-
-      {/* <Text style={styles.score}>Score: {score}</Text> */}
+      {showEndScreen && <GameOver retry={() => retry()}></GameOver>}
     </View>
   );
 }
