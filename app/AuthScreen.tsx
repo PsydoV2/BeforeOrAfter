@@ -10,7 +10,7 @@ import { Text, View } from "@/components/Themed";
 import { useSession } from "@/src/context/ctx";
 import { router } from "expo-router";
 
-export default function Login() {
+export default function AuthScreen() {
   const { signIn } = useSession();
   const colorScheme = useColorScheme();
 

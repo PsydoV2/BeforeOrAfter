@@ -5,10 +5,8 @@ import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
-import { API_TOKEN } from "@env";
+// import { API_TOKEN } from "@env";
 import { Circle } from "react-native-progress";
-import { Feather } from "@expo/vector-icons";
-import { Ionicons } from "@expo/vector-icons";
 import GameOver from "@/components/GameOver";
 
 interface MovieProps {
@@ -20,6 +18,7 @@ interface MovieProps {
 }
 
 export default function TabOneScreen() {
+  const API_TOKEN = "ba5bd1b3";
   const { signOut, session } = useSession();
   const [currentMovie, setCurrentMovie] = useState<MovieProps | null>(null);
   const [nextMovie, setNextMovie] = useState<MovieProps | null>(null);
