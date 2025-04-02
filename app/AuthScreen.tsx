@@ -26,7 +26,11 @@ export default function AuthScreen() {
       source={require("../assets/images/menuBack.png")}
       style={styles.background}
     >
-      <Text style={styles.title}>BEFORE OR AFTER</Text>
+      <View style={styles.titleBox}>
+        <Text style={styles.titleRed}>BEFORE</Text>
+        <Text style={styles.titleOr}>OR</Text>
+        <Text style={styles.titleGreen}>AFTER</Text>
+      </View>
       <TouchableOpacity onPress={() => handleLogin()}>
         <Text style={styles.start}>START</Text>
       </TouchableOpacity>
@@ -42,10 +46,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
+    gap: 50,
   },
-  title: {
-    fontSize: 45,
-    marginBottom: 100,
+  titleBox: {
+    width: 300,
+    // backgroundColor: "red",
+    backgroundColor: "transparent",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 0,
+  },
+  titleRed: {
+    fontSize: 80,
+    color: "red",
+  },
+  titleGreen: {
+    fontSize: 80,
+    color: "green",
+  },
+  titleOr: {
+    fontSize: 30,
   },
   start: {
     fontSize: 30,

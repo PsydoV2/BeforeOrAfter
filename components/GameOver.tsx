@@ -3,17 +3,19 @@ import { Text, View } from "./Themed";
 
 interface Props {
   retry: () => void;
+  score: number;
 }
 
-export default function GameOver({ retry }: Props) {
+export default function GameOver(props: Props) {
   return (
     <View style={styles.overlay}>
       <View style={styles.popup}>
         <Text style={styles.title}>💀 Game Over!</Text>
-        <Text style={styles.subtitle}>Your streak has ended.</Text>
+        <Text style={styles.subtitle}>Score: {props.score}</Text>
+
         <Text style={styles.subtitle}>Want to try again? 🎬</Text>
 
-        <TouchableOpacity style={styles.button} onPress={retry}>
+        <TouchableOpacity style={styles.button} onPress={props.retry}>
           <Text style={styles.buttonText}>🔁 Retry</Text>
         </TouchableOpacity>
       </View>

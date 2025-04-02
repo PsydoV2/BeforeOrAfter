@@ -1,10 +1,11 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
+import { Text } from "@/components/Themed";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -31,9 +32,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          headerShown: false,
           title: "",
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="gamepad" color={color} />
+          ),
+          headerLeft: () => (
+            <>
+              <Text style={styles.gameName}>BEFORE or AFTER</Text>
+            </>
           ),
           headerRight: () => (
             <Link href="/modal" asChild>
@@ -55,11 +62,23 @@ export default function TabLayout() {
         name="history"
         options={{
           title: "",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="history" color={color} />
+            <TabBarIcon name="info-circle" color={color} />
+          ),
+          headerLeft: () => (
+            <>
+              <Text style={styles.gameName}>BEFORE or AFTER</Text>
+            </>
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  gameName: {
+    paddingLeft: 10,
+  },
+});

@@ -188,7 +188,9 @@ export default function TabOneScreen() {
         )}
       </View>
 
-      {showEndScreen && <GameOver retry={() => retry()}></GameOver>}
+      {showEndScreen && (
+        <GameOver score={score} retry={() => retry()}></GameOver>
+      )}
     </View>
   );
 }
