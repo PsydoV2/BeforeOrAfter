@@ -20,7 +20,7 @@ export default function ModalScreen() {
       </Text>
       <Text style={styles.text}>
         Two movie posters will appear on screen. Your task is to guess if the
-        **second movie** was released **before** or **after** the first one.
+        second movie was released before or after the first one.
       </Text>
       <Text style={styles.text}>
         ⬅️ Tap “Before” if it was released earlier
