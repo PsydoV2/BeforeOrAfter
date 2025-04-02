@@ -5,7 +5,6 @@ import * as Haptics from "expo-haptics";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
-// import { API_TOKEN } from "@env";
 import { Circle } from "react-native-progress";
 import GameOver from "@/components/GameOver";
 
@@ -25,15 +24,7 @@ export default function TabOneScreen() {
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [showEndScreen, toggleEndScreen] = useState(false);
-
-  useEffect(() => {
-    if (!currentMovie) getMovie(setCurrentMovie);
-    if (!nextMovie) getMovie(setNextMovie);
-    console.log("start game");
-    console.log(currentMovie);
-    console.log(nextMovie);
-    console.log(API_TOKEN);
-  }, []);
+  const [movieCache, setMovieCache] = useState<MovieProps[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -47,43 +38,91 @@ export default function TabOneScreen() {
       }
     };
     load();
+
+    const initGame = async () => {
+      await preloadMovies(15); // mehr laden = mehr Varianz
+
+      // Zwei unterschiedliche Filme aus dem Cache ziehen
+      let first = popMovieFromCache();
+      let second = popMovieFromCache();
+
+      // Backup: falls zweiter fehlt oder gleich ist, nochmal versuchen
+      for (
+        let i = 0;
+        i < 5 && (!second || second.imdbID === first?.imdbID);
+        i++
+      ) {
+        second = popMovieFromCache();
+      }
+
+      // Wenn es immer noch nicht klappt: Abbruch oder Dummy
+      if (!first || !second || first.imdbID === second.imdbID) {
+        console.warn("Nicht genügend unterschiedliche Filme gefunden.");
+        toggleEndScreen(true); // oder Fehleranzeige
+        return;
+      }
+
+      setCurrentMovie(first);
+      setNextMovie(second);
+    };
+
+    initGame();
   }, []);
 
   const randomIntFromInterval = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
 
-  const getMovie = async (setter: (movie: MovieProps) => void) => {
+  const popMovieFromCache = (): MovieProps | null => {
+    if (movieCache.length === 0) return null;
+    const movie = movieCache[0];
+    setMovieCache((prev) => prev.slice(1));
+    return movie;
+  };
+
+  const preloadMovies = async (count: number, maxAttempts = 10) => {
+    let loaded: MovieProps[] = [...movieCache];
+    let attempts = 0;
+    const seenIDs = new Set(loaded.map((m) => m.imdbID));
+
+    while (loaded.length < count && attempts < maxAttempts) {
+      const batch = await fetchMoviesBatch();
+      const filtered = batch.filter(
+        (m) => m.Poster !== "N/A" && !seenIDs.has(m.imdbID)
+      );
+      filtered.forEach((m) => seenIDs.add(m.imdbID));
+      loaded = [...loaded, ...filtered];
+      attempts++;
+    }
+
+    setMovieCache(loaded);
+  };
+
+  const fetchMoviesBatch = async (): Promise<MovieProps[]> => {
+    const movies: MovieProps[] = [];
+    const randomYear = randomIntFromInterval(1950, new Date().getFullYear());
     try {
-      const randomYear = randomIntFromInterval(1950, new Date().getFullYear());
       const res = await fetch(
         `https://www.omdbapi.com/?apikey=${API_TOKEN}&s=movie&y=${randomYear}&type=movie`
       );
       const data = await res.json();
-
-      if (data.Response === "False" || !data.Search?.length) {
-        return getMovie(setter);
+      if (data.Response === "True" && data.Search?.length) {
+        data.Search.forEach((movie: MovieProps) => {
+          if (movie.Poster !== "N/A") movies.push(movie);
+        });
       }
-
-      const index = randomIntFromInterval(0, data.Search.length - 1);
-      const movie = data.Search[index];
-
-      if (!movie || movie.Poster === "N/A") {
-        return getMovie(setter);
-      }
-
-      setter(movie);
     } catch (err) {
       console.error("API Error", err);
-      getMovie(setter);
     }
+    return movies;
   };
 
   const retry = () => {
     toggleEndScreen(false);
-    setCurrentMovie(null);
-    getMovie(setCurrentMovie);
-    setNextMovie(null);
+    setScore(0);
+    setCurrentMovie(popMovieFromCache());
+    setNextMovie(popMovieFromCache());
+    if (movieCache.length < 5) preloadMovies(10);
   };
 
   const storeScore = async (scoreToStore: number) => {
@@ -91,7 +130,6 @@ export default function TabOneScreen() {
       try {
         const jsonValue = JSON.stringify(scoreToStore);
         await AsyncStorage.setItem("scoreMovie", jsonValue);
-        console.log("Saved Score: ", scoreToStore);
         setHighScore(scoreToStore);
       } catch (e) {
         console.error("Fehler beim Speichern des Scores:", e);
@@ -99,35 +137,31 @@ export default function TabOneScreen() {
     }
   };
 
+  const handleAnswer = (isCorrect: boolean) => {
+    if (isCorrect) {
+      setScore((prev) => prev + 1);
+      setCurrentMovie(nextMovie);
+      const newMovie = popMovieFromCache();
+      setNextMovie(newMovie);
+      if (movieCache.length < 5) preloadMovies(10);
+    } else {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      storeScore(score);
+      toggleEndScreen(true);
+    }
+  };
+
   const before = () => {
     if (currentMovie && nextMovie) {
-      if (parseInt(currentMovie.Year) > parseInt(nextMovie.Year)) {
-        setScore(score + 1);
-        setCurrentMovie(nextMovie);
-        setNextMovie(null);
-        getMovie(setNextMovie);
-      } else {
-        setScore(0);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        storeScore(score);
-        toggleEndScreen(true);
-      }
+      const isCorrect = parseInt(currentMovie.Year) >= parseInt(nextMovie.Year);
+      handleAnswer(isCorrect);
     }
   };
 
   const after = () => {
     if (currentMovie && nextMovie) {
-      if (parseInt(currentMovie.Year) < parseInt(nextMovie.Year)) {
-        setScore(score + 1);
-        setCurrentMovie(nextMovie);
-        setNextMovie(null);
-        getMovie(setNextMovie);
-      } else {
-        setScore(0);
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        storeScore(score);
-        toggleEndScreen(true);
-      }
+      const isCorrect = parseInt(currentMovie.Year) <= parseInt(nextMovie.Year);
+      handleAnswer(isCorrect);
     }
   };
 
@@ -188,9 +222,7 @@ export default function TabOneScreen() {
         )}
       </View>
 
-      {showEndScreen && (
-        <GameOver score={score} retry={() => retry()}></GameOver>
-      )}
+      {showEndScreen && <GameOver score={score} retry={retry} />}
     </View>
   );
 }
