@@ -1,65 +1,57 @@
-# Movie Guessing Game
+# 🎬 BeforeOrAfter
 
-Willkommen beim Movie Guessing Game! Diese App ist ein unterhaltsamer und interaktiver Weg, dein Wissen über Filmpremieren zu testen. Versuche zu erraten, ob ein Film vor oder nach einem anderen veröffentlicht wurde, um Punkte zu sammeln und deinen Highscore zu übertreffen.
+**BeforeOrAfter** is a simple and addictive movie quiz app built with **Expo**. The goal is to guess whether a movie was released **before** or **after** another one. It’s perfect for movie lovers who want to test or expand their film knowledge in a fun way.
 
-## Funktionen
+## 📱 Features
 
-- **Zufällige Filmauswahl:** Die App ruft zufällige Filme von der OMDb API basierend auf einem zufälligen Jahr ab.
-- **Punkteverfolgung:** Verfolge deinen aktuellen Punktestand und Highscore.
-- **Haptisches Feedback:** Genieße haptisches Feedback bei falschen Antworten.
-- **Persistente Speicherung:** Highscores werden lokal mit AsyncStorage gespeichert.
+- 🎥 Guess the release order of two movies
+- 🔄 Randomized movie combinations for endless play
+- 🧠 Keeps track of your current and highest score
+- 🖼️ Clean and modern UI using React Native
+- ⚡ Fast and responsive performance with Expo
 
-## Installation
+## 🕹️ Gameplay
 
-Folge diesen Schritten, um die App auf deinem lokalen Rechner einzurichten:
+1. The app shows a reference movie with title, poster, and release year.
+2. A second movie is shown (title + poster, **no year**).
+3. You select whether the second movie came **before** or **after**.
+4. If correct, your score increases and the next round begins.
+5. A wrong answer resets the game — try to beat your high score!
 
-1. **Repository klonen:**
+## 🚀 Getting Started
 
-   ```bash
-   git clone https://github.com/yourusername/movie-guessing-game.git
-   cd movie-guessing-game
-   ```
+### Prerequisites
 
-2. **Abhängigkeiten installieren:**
+- [Node.js](https://nodejs.org/)
+- [Expo CLI](https://docs.expo.dev/get-started/installation/)
 
-   ```bash
-   npm install
-   ```
+### Installation
 
-3. **Erstelle eine `.env` Datei im Stammverzeichnis und füge deinen OMDb API-Schlüssel hinzu:**
+```bash
+git clone https://github.com/PsydoV2/BeforeOrAfter.git
+cd BeforeOrAfter
+npm install
+expo start
+```
 
-   ```
-   API_TOKEN=your_omdb_api_key
-   ```
+Scan the QR code with the Expo Go app on your phone to run the app.
 
-4. **Starte die App:**
+## 🧰 Tech Stack
 
-   ```bash
-   npm start
-   ```
+- **React Native** with **Expo**
+- **TMDB API** for fetching movie data
+- **AsyncStorage** for saving the high score
+- **Custom UI** with Open Sans font and minimal design
 
-   Dies startet den Expo-Entwicklungsserver. Du kannst dann die Expo Go App auf deinem mobilen Gerät verwenden, um den QR-Code zu scannen und die App auszuführen.
+## 🖼️ Assets
 
-## Abhängigkeiten
+- Movie posters are loaded dynamically via TMDB
+- All other icons and fonts are open-source or royalty-free
 
-- **React & React Native:** Kernbibliotheken zum Erstellen der App.
-- **Expo:** Framework und Plattform für universelle React-Anwendungen.
-- **AsyncStorage:** Zur persistenten Speicherung von Highscores.
-- **OMDb API:** Zum Abrufen von Filmdaten.
+## 🔮 Future Improvements
 
-## Preview
-
-Benötigt ExpoGo App
-
-iOS -> Mit der Kamera scannen <br>
-Android -> Mit der ExpoGo App scannen
-
-![image](https://github.com/user-attachments/assets/178d90d5-ab69-4085-9beb-f844fbc23154)
-
-![img](https://i.imgur.com/Afs94lj.png)
-
-## Lizenz
-
-Dieses Projekt ist unter der MIT-Lizenz lizenziert. Siehe die [LICENSE](LICENSE) Datei für Details.
-
-Viel Spaß beim Spiel und beim Raten der Filmpremieren! Wenn du auf Probleme stößt, öffne gerne ein Issue auf GitHub.
+- 🌍 Localization / multiple languages
+- 🏆 Online leaderboards
+- 🕹️ Game modes (e.g. timed, categories, streaks)
+- 📊 Stats screen with detailed history
+- 🖥️ Web version
