@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
   },
   titleOr: {
     fontSize: 30,
+    color: "white",
   },
   start: {
     fontSize: 30,
@@ -79,5 +80,6 @@ const styles = StyleSheet.create({
     width: 200,
     textAlign: "center",
     borderRadius: 10,
+    color: "white",
   },
 });
