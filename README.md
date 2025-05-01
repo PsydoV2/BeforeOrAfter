@@ -55,3 +55,9 @@ Scan the QR code with the Expo Go app on your phone to run the app.
 - 🕹️ Game modes (e.g. timed, categories, streaks)
 - 📊 Stats screen with detailed history
 - 🖥️ Web version
+
+---
+
+---
+
+[![Donation](https://sfalter.de/FileHosting/Donation.png)](https://streamlabs.com/psydoooo/tip)
